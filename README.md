@@ -21,7 +21,7 @@ Group library images to clusters where every cluster contains similar images.
 Example usage:
 
 ```
-python cluster_library.py --select_distance
+python cluster_library.py --select_distance --show_examples
 ```
 
 
