@@ -35,3 +35,13 @@ Example usage:
 python image_query.py -q dataset/100000.png -s 0.90
 ```
 
+**find_duplicates**
+
+Find (and optionaly delete) duplicate images from library.
+
+Example usage:
+
+```
+python find_duplicates.py -l library.json -s 0.98
+```
+
