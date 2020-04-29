@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-from src.utils import load_json
+from src.utils import load_json, save_json
 
 
 def main():
@@ -20,8 +20,8 @@ def main():
     args = parser.parse_args()
 
     library = load_json(args.library)
-    paths = library["paths"]
-    features = np.array(library["features"])
+    paths = library["paths"].copy()
+    features = np.array(library["features"].copy())
 
     similarities = cosine_similarity(features)
     np.fill_diagonal(similarities, 0)
@@ -34,8 +34,11 @@ def main():
 
         indices = np.where(row > args.similarity_threshold)[0]
         if len(indices) > 0:
-            print(f"Photo {k}; duplicates {indices}")
+            ref_filename = os.path.split(paths[k])[1]
+            duplicate_filenames = [os.path.split(paths[i])[1] for i in indices]
+            print(f"Photo {ref_filename}; duplicates {duplicate_filenames}")
             all_duplicates = all_duplicates + indices.tolist()
+            all_duplicates = list(set(all_duplicates))
 
             reference_image = cv2.imread(paths[k])
             duplicate_images = cv2.resize(reference_image, (150, 150))
@@ -47,7 +50,7 @@ def main():
                     image = cv2.resize(image, (150, 150))
                     duplicate_images = np.hstack([duplicate_images, image])
 
-                cv2.imshow(f"Duplicate images for {k}", duplicate_images)
+                cv2.imshow(f"Duplicate images for {ref_filename}", duplicate_images)
 
     if args.display:
         cv2.waitKey(0)
@@ -57,6 +60,17 @@ def main():
             p = paths[i]
             print(f"Removing file {p}")
             os.remove(p)
+
+        print("Creating new library...")
+        new_library = {}
+        new_features = library["features"].copy()
+        new_paths = library["paths"].copy()
+        for index in sorted(all_duplicates, reverse=True):
+            del new_features[index]
+            del new_paths[index]
+        new_library["features"] = new_features
+        new_library["paths"] = new_paths
+        save_json(args.library, new_library)
 
 
 if __name__ == "__main__":
