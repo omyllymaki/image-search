@@ -13,17 +13,15 @@ def calculate_clusters(linkage_matrix, max_distance=None, n_clusters=None):
         clusters = fcluster(linkage_matrix, n_clusters, criterion='maxclust')
         return clusters
 
-    n_clusters = calculate_optimal_number_of_clusters(linkage_matrix)
-    clusters = fcluster(linkage_matrix, n_clusters, criterion='maxclust')
+    distance = calculate_distance(linkage_matrix)
+    clusters = fcluster(linkage_matrix, distance, criterion='distance')
     return clusters
 
 
-def calculate_optimal_number_of_clusters(linkage_matrix):
+def calculate_distance(linkage_matrix, threshold=0.2):
     distances = linkage_matrix[:, 2]
-    acceleration = np.diff(distances, 2)
-    acceleration_reversed = acceleration[::-1]
-    n_clusters = acceleration_reversed.argmax() + 2
-    return n_clusters
+    distances_normed = distances / distances.max()
+    return distances[distances_normed > threshold][0]
 
 
 def calculate_linkage_matrix(X):
