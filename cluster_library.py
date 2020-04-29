@@ -46,7 +46,7 @@ def main():
     # Just show some examples
     for c in unique_clusters:
         cluster_paths = np.array(paths)[clusters == c]
-        image = np.zeros((150, 150, 3), np.uint8)
+        image = cv2.imread(cluster_paths[0])
         montage = cv2.resize(image, (150, 150))
         for p in cluster_paths[1:args.n_samples + 1]:
             image = cv2.imread(p)
