@@ -5,7 +5,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.clustering import calculate_clusters, calculate_linkage_matrix
+from src.clustering import calculate_clusters, calculate_linkage_matrix, kmeans_clustering
 from src.utils import load_json
 from src.visualization import plot_linkage_data
 
@@ -16,6 +16,7 @@ def main():
     parser.add_argument("-n", "--n_samples", default=10, type=int, help="Number of samples to show for every cluster.")
     parser.add_argument("-d", "--distance", default=-1, type=int, help="Distance threshold for clustering.")
     parser.add_argument("-o", "--output", default="clustering_output", help="Path for clustering results.")
+    parser.add_argument("-m", "--method", default="kmeans", help="Clustering method.")
     parser.add_argument('--select_distance', dest='select_distance', action='store_true',
                         help="Option for selecting threshold distance based on dendogram figure")
     parser.add_argument('--show_examples', dest='show_examples', action='store_true',
@@ -30,15 +31,20 @@ def main():
 
     linkage_matrix = calculate_linkage_matrix(features)
 
-    threshold_distance = None
-    if args.distance > 0:
-        threshold_distance = args.distance
-    if args.select_distance:
-        plot_linkage_data(linkage_matrix)
-        plt.show()
-        threshold_distance = float(input('Enter threshold distance for clustering:'))
+    if args.method == "hierarchical":
+        threshold_distance = None
+        if args.distance > 0:
+            threshold_distance = args.distance
+        if args.select_distance:
+            plot_linkage_data(linkage_matrix)
+            plt.show()
+            threshold_distance = float(input('Enter threshold distance for clustering:'))
 
-    clusters = calculate_clusters(linkage_matrix, threshold_distance)
+        clusters = calculate_clusters(linkage_matrix, threshold_distance)
+    elif args.method == "kmeans":
+        clusters = kmeans_clustering(features, range(3, 30))
+    else:
+        raise Exception("Unknown clustering method")
 
     unique_clusters = set(clusters)
     print(f"Found {len(unique_clusters)} clusters")
