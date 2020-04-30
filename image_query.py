@@ -7,6 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from src.feature_extractor import FeatureExtractor
 from src.utils import load_json, load_image
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -37,13 +38,14 @@ def main():
         print(f"Saving results to {args.output}")
         os.makedirs(args.output, exist_ok=True)
 
-    query_resized = cv2.resize(np.array(query_image), (512, 512))
+    query_image = cv2.cvtColor(np.array(query_image), cv2.COLOR_RGB2BGR)
+    query_resized = cv2.resize(query_image, (512, 512))
     cv2.imshow("Query", query_resized)
 
     for i in indices[:args.n_samples]:
         score = similarities[i]
         path = paths[i]
-        image = load_image(path)
+        image = cv2.imread(path)
         image_resized = cv2.resize(np.array(image), (512, 512))
         cv2.imshow(f"Score: {score}", image_resized)
         cv2.waitKey(0)
