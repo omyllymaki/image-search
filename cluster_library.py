@@ -17,6 +17,8 @@ def main():
     parser.add_argument("-d", "--distance", default=-1, type=int, help="Distance threshold for clustering.")
     parser.add_argument("-o", "--output", default="clustering_output", help="Path for clustering results.")
     parser.add_argument("-m", "--method", default="kmeans", help="Clustering method.")
+    parser.add_argument("-kmin", "--kmin", default=2, type=int, help="Lower limit for kmean clustering")
+    parser.add_argument("-kmax", "--kmax", default=30, type=int, help="Upper limit for kmean clustering")
     parser.add_argument('--select_distance', dest='select_distance', action='store_true',
                         help="Option for selecting threshold distance based on dendogram figure")
     parser.add_argument('--show_examples', dest='show_examples', action='store_true',
@@ -39,10 +41,9 @@ def main():
             plot_linkage_data(linkage_matrix)
             plt.show()
             threshold_distance = float(input('Enter threshold distance for clustering:'))
-
         clusters = calculate_clusters(linkage_matrix, threshold_distance)
     elif args.method == "kmeans":
-        clusters = kmeans_clustering(features, range(3, 30))
+        clusters = kmeans_clustering(features, range(args.kmin, args.kmax+1))
     else:
         raise Exception("Unknown clustering method")
 

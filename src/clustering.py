@@ -1,10 +1,9 @@
-import numpy as np
+import matplotlib.pyplot as plt
 from scipy.cluster import hierarchy as hc
 from scipy.cluster.hierarchy import fcluster
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.metrics.pairwise import cosine_similarity
-import matplotlib.pyplot as plt
 
 
 def calculate_clusters(linkage_matrix, max_distance=None, n_clusters=None):
@@ -40,17 +39,14 @@ def kmeans_clustering(features, n_cluster_candidates=None, metric="cosine"):
 
     max_score = 0
     result = None
-    scores = []
     for n_clusters in n_cluster_candidates:
         kmeans = KMeans(n_clusters=n_clusters)
         kmeans.fit(features)
         labels = kmeans.labels_
         score = silhouette_score(features, labels, metric=metric)
-        scores.append(score)
         if score > max_score:
             result = labels
             max_score = score
-    plt.plot(n_cluster_candidates, scores, "-o")
     plt.show()
 
     return result
