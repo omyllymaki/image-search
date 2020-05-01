@@ -3,6 +3,7 @@ import json
 import os
 from typing import Tuple
 
+import cv2
 import numpy as np
 from PIL import Image
 
@@ -46,3 +47,7 @@ def load_image(file_path):
         return image
     else:
         return None
+
+
+def pil_to_array(image):
+    return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
