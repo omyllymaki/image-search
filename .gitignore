@@ -131,3 +131,4 @@ dmypy.json
 # Other
 library.json
 .idea/
+src/object_detection/config/yolov3.weights
