@@ -1,6 +1,6 @@
 import argparse
 
-from src.feature_extractor import FeatureExtractor
+from src.features.feature_extractor import FeatureExtractor
 from src.utils import get_file_paths, save_json, load_image
 
 EXTENSIONS = (".jpg", ".png")

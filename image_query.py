@@ -5,9 +5,8 @@ import cv2
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-from src.feature_extractor import FeatureExtractor
+from src.features.feature_extractor import FeatureExtractor
 from src.utils import load_json, load_image
-import matplotlib.pyplot as plt
 
 
 def main():
