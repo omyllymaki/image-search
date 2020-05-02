@@ -24,12 +24,12 @@ def main():
     args = ap.parse_args()
 
     paths = get_file_paths(args.dataset, EXTENSIONS)
-    detector = ObjectDetector(confidence_threshold=args.threshold)
+    detector = ObjectDetector(confidence_threshold=args.threshold, model_image_size=608)
     for i, p in enumerate(paths):
         print(f"{i + 1}/{len(paths)}")
         image = load_image(p)
         if image is not None:
-            detections = detector.detect(image)
+            detections = detector.run(image)
             if len(detections) > 0:
                 detected_classes = list(set([d["class"] for d in detections]))
                 _, filename = os.path.split(p)
@@ -37,6 +37,7 @@ def main():
                 if args.show:
                     image_array = pil_to_array(image)
                     image_array = add_detection_boxes_to_image(image_array, detections)
+                    image_array = cv2.resize(image_array, (500, 500))
                     cv2.imshow(f"{filename}", image_array)
                     cv2.waitKey(0)
 

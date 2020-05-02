@@ -33,7 +33,7 @@ class FeatureExtractor:
         feature_layer.register_forward_hook(self._copy_data)
         self.model = model
 
-    def extract(self, image):
+    def run(self, image):
         transformed_image = self.TRANSFORMATIONS(image).unsqueeze(0).to(self.DEVICE)
         self.model(transformed_image)
         return self.feature_vector.detach().cpu().numpy().tolist()

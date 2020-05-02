@@ -30,7 +30,7 @@ class ObjectDetector:
         self.model = self._load_pretrained_darknet_model(config_path, weights_path, self.model_image_size)
         self.model.to(DEVICE)
 
-    def detect(self, image):
+    def run(self, image):
         image_tensor = self._process_image(image, self.model_image_size).to(DEVICE)
         detections = self._detect_image_objects(image_tensor)
         results = []

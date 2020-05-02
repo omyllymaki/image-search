@@ -8,7 +8,7 @@ import numpy as np
 from src.clustering.hierarchical import calculate_clusters, calculate_linkage_matrix
 from src.clustering.kmeans import calculate_clusters
 from src.utils import load_json
-from src.visualization import plot_linkage_data
+from src.clustering.visualization import plot_linkage_data
 
 
 def main():

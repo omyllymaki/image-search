@@ -20,7 +20,7 @@ def main():
         print(f"{i + 1}/{len(paths)}")
         image = load_image(p)
         if image is not None:
-            feature_vector = extractor.extract(image)
+            feature_vector = extractor.run(image)
             library_features.append(feature_vector)
             valid_paths.append(p)
 

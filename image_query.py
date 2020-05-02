@@ -27,7 +27,7 @@ def main():
     library_features = np.array(library["features"])
 
     extractor = FeatureExtractor()
-    feature_vector = np.array(extractor.extract(query_image)).reshape(1, -1)
+    feature_vector = np.array(extractor.run(query_image)).reshape(1, -1)
     similarities = cosine_similarity(feature_vector, library_features).reshape(-1)
     indices = np.flip(np.argsort(similarities))
     similarities_sorted = similarities[indices]

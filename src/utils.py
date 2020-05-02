@@ -1,6 +1,8 @@
 import io
 import json
 import os
+import stat
+import time
 from typing import Tuple
 
 import cv2
@@ -51,3 +53,34 @@ def load_image(file_path):
 
 def pil_to_array(image):
     return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+
+
+def recursive_glob(rootdir, suffix):
+    return [os.path.join(looproot, filename)
+            for looproot, _, filenames in os.walk(rootdir)
+            for filename in filenames if filename.endswith(suffix)]
+
+
+def load_images(paths):
+    valid_paths, images = [], []
+    for path in paths:
+        image = load_image(path)
+        if image is not None:
+            images.append(image)
+            valid_paths.append(path)
+    return images, valid_paths
+
+
+def collect_file_info(path):
+    filename = os.path.split(path)[-1]
+    absolute_path = os.path.abspath(path)
+    file_stats = os.stat(path)
+    file_info = {
+        'path': path,
+        'absolute_path': absolute_path,
+        'filename': filename,
+        'file_size': file_stats[stat.ST_SIZE],
+        'last_modified_time': time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(file_stats[stat.ST_MTIME])),
+        'creation_time': time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(file_stats[stat.ST_CTIME]))
+    }
+    return file_info

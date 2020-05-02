@@ -1,0 +1,1 @@
+EXTENSIONS = (".jpg", ".png")
