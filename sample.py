@@ -3,10 +3,9 @@ import os
 import cv2
 import numpy as np
 from sqlalchemy import create_engine
-
 from src.database.db_reader import DBReader
 from src.db_synchronizer import DBSynchronizer
-from src.image_analyzer import DBAnalyzer
+from src.db_analyzer import DBAnalyzer
 from src.utils import load_image, pil_to_array
 
 
