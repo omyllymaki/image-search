@@ -7,7 +7,7 @@ class ImageProcessor:
 
     def __init__(self):
         self.pipeline = {
-            "features": FeatureExtractor(),
+            "feature_vector": FeatureExtractor(),
             "detections": ObjectDetector(),
             "blurriness": BlurryDetector(),
         }
@@ -16,5 +16,5 @@ class ImageProcessor:
         results = {}
         for key, processor in self.pipeline.items():
             results[key] = processor.run(image)
-        results["size"] = list(image.size)
+        results["image_size"] = list(image.size)
         return results

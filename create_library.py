@@ -1,34 +1,28 @@
-import argparse
+import sys
 
-from src.features.feature_extractor import FeatureExtractor
-from src.utils import get_file_paths, save_json, load_image
+from sqlalchemy import create_engine
 
-EXTENSIONS = (".jpg", ".png")
+from src.database.models import create_tables
+from src.database.db_populator import Populator
 
+sys.path.append('./src/object_detection/PyTorchYOLOv3')
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-d", "--dataset", required=True, help="Path to input dataset.")
-    ap.add_argument("-o", "--output", default="library.json", help="Output path.")
-    args = ap.parse_args()
+from constants import EXTENSIONS
+from src.image_processor import ImageProcessor
+from src.utils import recursive_glob, load_image, collect_file_info
 
-    extractor = FeatureExtractor()
+processor = ImageProcessor()
+paths = recursive_glob("small_dataset", EXTENSIONS)[:15]
 
-    paths = get_file_paths(args.dataset, EXTENSIONS)
-    library_features, valid_paths = [], []
-    for i, p in enumerate(paths):
-        print(f"{i + 1}/{len(paths)}")
-        image = load_image(p)
-        if image is not None:
-            feature_vector = extractor.run(image)
-            library_features.append(feature_vector)
-            valid_paths.append(p)
+data = []
+for i, path in enumerate(paths):
+    print(f"{i + 1}/{len(paths)}")
+    image = load_image(path)
+    results = processor.process(image)
+    file_info = collect_file_info(path)
+    data.append({**results, **file_info})
 
-    library = {}
-    library["features"] = library_features
-    library["paths"] = valid_paths
-    save_json(args.output, library)
-
-
-if __name__ == "__main__":
-    main()
+engine = create_engine('sqlite:///library.db')
+create_tables(engine)
+populator = Populator(engine)
+populator.populate(data)

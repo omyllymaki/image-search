@@ -1,8 +1,8 @@
+import datetime
 import io
 import json
 import os
 import stat
-import time
 from typing import Tuple
 
 import cv2
@@ -80,7 +80,7 @@ def collect_file_info(path):
         'absolute_path': absolute_path,
         'filename': filename,
         'file_size': file_stats[stat.ST_SIZE],
-        'last_modified_time': time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(file_stats[stat.ST_MTIME])),
-        'creation_time': time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(file_stats[stat.ST_CTIME]))
+        'last_modified': datetime.datetime.fromtimestamp(file_stats.st_ctime),
+        'created': datetime.datetime.fromtimestamp(file_stats.st_ctime)
     }
     return file_info
