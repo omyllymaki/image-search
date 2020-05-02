@@ -3,12 +3,9 @@ import sys
 
 sys.path.append('./src/object_detection/PyTorchYOLOv3')
 
-from sqlalchemy import create_engine
-
 from src.database.models import create_tables, File
 from src.database.db_populator import Populator
 
-from constants import EXTENSIONS
 from src.image_processor import ImageProcessor
 from sqlalchemy.orm import sessionmaker
 from src.utils import recursive_glob, load_image, collect_file_info
@@ -16,16 +13,15 @@ from src.utils import recursive_glob, load_image, collect_file_info
 
 class DBSynchronizer:
 
-    def __init__(self, images_folder, db_name='library.db', image_types=EXTENSIONS):
+    def __init__(self, images_folder, db_engine, image_types=(".jpg", ".png")):
         self.images_folder = images_folder
         self.image_types = image_types
-        self.engine = create_engine('sqlite:///' + db_name)
+        self.engine = db_engine
         self._initialize_database()
-        self.processor = ImageProcessor()
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
-    def update_link(self):
+    def synchronize(self):
         local_paths = self._get_image_paths()
         db_paths = self._get_image_paths_in_database()
         local_paths_not_in_db = set(local_paths) - set(db_paths)
@@ -38,6 +34,7 @@ class DBSynchronizer:
     def _add_new_images_to_db(self, paths):
         print(f"Found {len(paths)} new images that are not in database")
         print("Creating new items to database...")
+        self.processor = ImageProcessor()
         data = []
         for i, path in enumerate(paths):
             print(f"{i + 1}/{len(paths)}")
