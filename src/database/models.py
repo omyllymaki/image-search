@@ -40,6 +40,7 @@ class Detection(Base):
     object_id = Column(Integer, ForeignKey('object.id'))
     bbox = Column(String)
     confidence = Column(Float)
+    class_score = Column(Float)
 
 
 class Tag(Base):

@@ -18,17 +18,23 @@ class DBReader:
             all()
         return [item.absolute_path for item in query_output]
 
-    def get_detections(self, file_path):
+    def get_detections(self, file_path, min_confidence=None, min_class_score=None):
         query_output = self.session.query(Detection, Object, File). \
             join(Object).join(File). \
-            filter(File.absolute_path == file_path). \
-            all()
+            filter(File.absolute_path == file_path)
+        if min_confidence is not None:
+            query_output = query_output.filter(Detection.confidence > min_confidence)
+        if min_class_score is not None:
+            query_output = query_output.filter(Detection.class_score > min_class_score)
+        query_output = query_output.all()
 
         results = []
         for item in query_output:
             d = {
                 "class": item.Object.name,
-                "bbox": ast.literal_eval(item.Detection.bbox)
+                "bbox": ast.literal_eval(item.Detection.bbox),
+                "confidence": item.Detection.confidence,
+                "class_score": item.Detection.class_score
             }
             results.append(d)
         return results

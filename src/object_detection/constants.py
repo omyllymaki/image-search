@@ -6,4 +6,5 @@ CLASSES_PATH = os.path.join('config', 'coco.names')
 MODEL_IMAGE_SIZE = 608
 CONFIDENCE_THRESHOLD = 0.8
 SUPRESSION_THRESHOLD = 0.4
-DEVICE = 'cuda'         # 'cuda' or 'cpu'
+CLASS_SCORE_THRESHOLD = 0.0
+DEVICE = 'cuda'  # 'cuda' or 'cpu'

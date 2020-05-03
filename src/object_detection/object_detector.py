@@ -7,7 +7,7 @@ from torchvision import transforms
 from src.object_detection.PyTorchYOLOv3.models import Darknet
 from src.object_detection.PyTorchYOLOv3.utils.utils import load_classes, non_max_suppression
 from src.object_detection.constants import CLASSES_PATH, CONFIG_PATH, WEIGHTS_PATH, MODEL_IMAGE_SIZE, DEVICE, \
-    CONFIDENCE_THRESHOLD, SUPRESSION_THRESHOLD
+    CONFIDENCE_THRESHOLD, SUPRESSION_THRESHOLD, CLASS_SCORE_THRESHOLD
 import numpy as np
 
 sys.path.append('./PyTorchYOLOv3')
@@ -18,9 +18,11 @@ class ObjectDetector:
     def __init__(self,
                  confidence_threshold=CONFIDENCE_THRESHOLD,
                  supression_threshold=SUPRESSION_THRESHOLD,
+                 class_score_threshold=CLASS_SCORE_THRESHOLD,
                  model_image_size=MODEL_IMAGE_SIZE):
         self.confidence_threshold = confidence_threshold
         self.supression_threshold = supression_threshold
+        self.class_score_threshold = class_score_threshold
         self.model_image_size = model_image_size
         base_path = os.path.split(os.path.abspath(__file__))[0]
         classes_path = os.path.join(base_path, CLASSES_PATH)
@@ -36,12 +38,13 @@ class ObjectDetector:
         results = []
         if detections is not None:
             for detection in detections:
-                result = {}
-                result["bbox"] = self._get_bbox(np.array(image).shape, detection[:4])
-                result["class"] = self.classes[int(detection[6])]
-                result["object_confidence"] = detection[4]
-                result["class_score"] = detection[5]
-                results.append(result)
+                class_score = detection[5].item()
+                if class_score > self.class_score_threshold:
+                    result = {"bbox": self._get_bbox(np.array(image).shape, detection[:4]),
+                              "class": self.classes[int(detection[6])],
+                              "object_confidence": detection[4].item(),
+                              "class_score": class_score}
+                    results.append(result)
         return results
 
     def _detect_image_objects(self, image):

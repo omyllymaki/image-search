@@ -31,12 +31,14 @@ class Populator:
                 class_name = detection["class"]
                 bbox = detection["bbox"]
                 confidence = detection["object_confidence"]
+                class_score = detection["class_score"]
                 object = get_or_create(self.session, Object, name=class_name)
                 detection = get_or_create(self.session, Detection,
                                           file_id=file.id,
                                           object_id=object.id,
                                           bbox=str(bbox),
-                                          confidence=confidence
+                                          confidence=confidence,
+                                          class_score=class_score
                                           )
 
             face_detections = item["face_detections"]

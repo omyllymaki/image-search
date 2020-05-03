@@ -23,14 +23,21 @@ def add_text_to_image(image, text, x, y):
     cv2.putText(image, text, (x, y), cv2.FONT_HERSHEY_PLAIN, 1.5, (0, 0, 255), int(1.5))
 
 
-def add_detection_boxes_to_image(image_array, detections):
+def add_detection_boxes_to_image(image_array, detections, target_size):
+    ratio = (target_size[0] / image_array.shape[1], target_size[1] / image_array.shape[0])
+    image_array = cv2.resize(image_array, target_size)
     for detection in detections:
-        add_rectangle_to_image(image_array, detection["bbox"])
-        add_text_to_image(image_array, detection["class"], detection["bbox"][0], detection["bbox"][1] - 5)
+        bbox = detection["bbox"]
+        bbox[0] = int(ratio[0] * bbox[0])
+        bbox[1] = int(ratio[1] * bbox[1])
+        bbox[2] = int(ratio[0] * bbox[2])
+        bbox[3] = int(ratio[1] * bbox[3])
+        add_rectangle_to_image(image_array, bbox)
+        add_text_to_image(image_array, detection["class"], bbox[0], bbox[1] - 5)
     return image_array
 
 
-engine = create_engine('sqlite:///library.db')
+engine = create_engine('sqlite:///image_db.db')
 
 connector = DBSynchronizer("dataset", engine)
 db_reader = DBReader(engine)
@@ -41,12 +48,12 @@ connector.synchronize()
 print("Finding images with detected clock...")
 paths = db_reader.get_files_with_object(["clock"])
 print(f"Found {len(paths)} images with clock")
-for p in paths:
+for p in paths[:10]:
     _, filename = os.path.split(p)
     image = cv2.imread(p)
     detections = db_reader.get_detections(p)
     clock_detections = [d for d in detections if d["class"] == "clock"]
-    image = add_detection_boxes_to_image(image, clock_detections)
+    image = add_detection_boxes_to_image(image, clock_detections, (500, 500))
     cv2.imshow(f"{filename}", image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
