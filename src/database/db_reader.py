@@ -42,6 +42,7 @@ class DBReader:
         for item in query_output:
             d = {
                 "path": item.File.absolute_path,
-                "feature_vector": ast.literal_eval(item.Features.feature_vector)}
+                "feature_vector": ast.literal_eval(item.Features.feature_vector)
+            }
             results.append(d)
         return results
