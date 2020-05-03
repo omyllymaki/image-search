@@ -41,5 +41,20 @@ class Detection(Base):
     bbox = Column(String)
 
 
+class Tag(Base):
+    __tablename__ = 'tag'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+
+class ImageTags(Base):
+    __tablename__ = 'image_tags'
+
+    id = Column(Integer, primary_key=True)
+    file_id = Column(Integer, ForeignKey('file.id'))
+    tag_id = Column(Integer, ForeignKey('tag.id'))
+
+
 def create_tables(engine):
     Base.metadata.create_all(engine)
