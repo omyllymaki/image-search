@@ -4,9 +4,10 @@ import cv2
 import numpy as np
 from sqlalchemy import create_engine
 
-from src.image_clustering import ImageClustering
 from src.database.db_reader import DBReader
 from src.db_synchronizer import DBSynchronizer
+from src.duplicate_detector import DuplicateDetector
+from src.image_clustering import ImageClustering
 from src.image_search import ImageSearch
 from src.utils import load_image, pil_to_array
 
@@ -30,6 +31,7 @@ def add_detection_boxes_to_image(image_array, detections):
 
 
 engine = create_engine('sqlite:///library.db')
+
 connector = DBSynchronizer("dataset", engine)
 db_reader = DBReader(engine)
 
@@ -49,7 +51,7 @@ for p in paths:
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
-print("Initializing image search...")
+print("Reading feature array from database")
 data = db_reader.get_feature_vectors()
 feature_array = [d["feature_vector"] for d in data]
 all_paths = [d["path"] for d in data]
@@ -93,5 +95,30 @@ for c, paths in clustered_paths.items():
         else:
             montage = np.hstack([montage, image])
     cv2.imshow(f"Cluster {c}", montage)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+print(f"Finding duplicate images...")
+duplicate_detector = DuplicateDetector(feature_array)
+duplicates = duplicate_detector.find_duplicates(0.98)
+
+for ref_index, duplicate_indices in duplicates.items():
+
+    if len(duplicate_indices) > 0:
+        ref_filename = os.path.split(all_paths[ref_index])[1]
+        duplicate_filenames = [os.path.split(all_paths[i])[1] for i in duplicate_indices]
+        print(f"Photo {ref_filename}; duplicates {duplicate_filenames}")
+
+        reference_image = cv2.imread(all_paths[ref_index])
+        duplicate_images = cv2.resize(reference_image, (150, 150))
+
+        for i in duplicate_indices:
+            p = all_paths[i]
+            image = cv2.imread(p)
+            image = cv2.resize(image, (150, 150))
+            duplicate_images = np.hstack([duplicate_images, image])
+
+            cv2.imshow(f"Duplicate images for {ref_filename}", duplicate_images)
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
