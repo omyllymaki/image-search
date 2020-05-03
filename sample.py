@@ -13,9 +13,9 @@ from src.utils import load_image, pil_to_array
 
 
 def add_rectangle_to_image(image, bbox):
-    (x, y, w, h) = bbox
-    start_point = (x, y)
-    end_point = (x + w, y + h)
+    (x_start, y_start, x_end, y_end) = bbox
+    start_point = (x_start, y_start)
+    end_point = (x_end, y_end)
     cv2.rectangle(image, start_point, end_point, (0, 255, 0), 2)
 
 

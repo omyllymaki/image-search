@@ -39,6 +39,8 @@ class ObjectDetector:
                 result = {}
                 result["bbox"] = self._get_bbox(np.array(image).shape, detection[:4])
                 result["class"] = self.classes[int(detection[6])]
+                result["object_confidence"] = detection[4]
+                result["class_score"] = detection[5]
                 results.append(result)
         return results
 
@@ -86,4 +88,4 @@ class ObjectDetector:
         y1 = ((y1 - pad_y // 2) / unpad_h) * image_size[0]
         x1 = ((x1 - pad_x // 2) / unpad_w) * image_size[1]
 
-        return [int(x1), int(y1), int(box_w), int(box_h)]
+        return [int(x1), int(y1), int(box_w + x1), int(box_h + y1)]

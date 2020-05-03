@@ -26,13 +26,27 @@ class Populator:
                                      width=item["image_size"][0],
                                      height=item["image_size"][1])
 
-            detections = item["detections"]
-            for detection in detections:
+            object_detections = item["object_detections"]
+            for detection in object_detections:
                 class_name = detection["class"]
                 bbox = detection["bbox"]
+                confidence = detection["object_confidence"]
                 object = get_or_create(self.session, Object, name=class_name)
                 detection = get_or_create(self.session, Detection,
                                           file_id=file.id,
                                           object_id=object.id,
-                                          bbox=str(bbox)
+                                          bbox=str(bbox),
+                                          confidence=confidence
+                                          )
+
+            face_detections = item["face_detections"]
+            for detection in face_detections:
+                bbox = detection["bbox"]
+                confidence = detection["confidence"]
+                object = get_or_create(self.session, Object, name="face")
+                detection = get_or_create(self.session, Detection,
+                                          file_id=file.id,
+                                          object_id=object.id,
+                                          bbox=str(bbox),
+                                          confidence=confidence
                                           )

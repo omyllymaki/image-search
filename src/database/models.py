@@ -39,6 +39,7 @@ class Detection(Base):
     file_id = Column(Integer, ForeignKey('file.id'))
     object_id = Column(Integer, ForeignKey('object.id'))
     bbox = Column(String)
+    confidence = Column(Float)
 
 
 class Tag(Base):
