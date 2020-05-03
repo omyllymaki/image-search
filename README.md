@@ -1,47 +1,37 @@
-# Image Tools
+# Image search
 
-Misc set of scripts and tools to handle image files, e.g. collected photos.
+Tools to search and organize images. 
 
-## Scripts
+## Project vision
 
-**create_library**
+**Image processing functions**
 
-Create library from figures. Library contains calculated feature vectors and paths to images.
+Processing functions are used to extract useful information from images. Could include e.g.
 
-Example usage:
+- Tagging
+- Object detection
+- Extracting feature vectors
 
-```
-python create_library.py -d dataset
-```
+**Synchronized database**
 
-**cluster_library**
+Database stores information extracted from images and it is synchronized with local image files.
 
-Group library images to clusters where every cluster contains similar images.
+**Search functions and tools**
 
-Example usage:
+Could include e.g.
 
-```
-python cluster_library.py --select_distance --show_examples
-```
+- Image search based on image query
+- Image search based on text query
+- Clustering
+- Duplicate detection
+- Blurriness detection
+- Anomaly detection
+
+## Usage
+
+Run sample.py to see example usage. Sample uses dataset provided in repo.
 
 
-**image_query**
 
-Given query image, search similar images from library.
 
-Example usage:
-
-```
-python image_query.py -q dataset/100000.png -s 0.90
-```
-
-**find_duplicates**
-
-Find (and optionaly delete) duplicate images from library.
-
-Example usage:
-
-```
-python find_duplicates.py -l library.json -s 0.98
-```
 
