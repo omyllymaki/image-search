@@ -1,5 +1,6 @@
 import ast
 
+from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
 
 from src.database.models import File, Object, Detection, Features
@@ -11,11 +12,16 @@ class DBReader:
         Session = sessionmaker(bind=engine)
         self.session = Session()
 
-    def get_files_with_object(self, object_names):
+    def get_paths(self, object_names=None, min_confidence=None, min_class_score=None):
         query_output = self.session.query(File). \
-            join(Detection).join(Object). \
-            filter(Object.name.in_(object_names)). \
-            all()
+            join(Detection).join(Object)
+        if object_names is not None:
+            query_output = query_output.filter(Object.name.in_(object_names))
+        if min_confidence is not None:
+            query_output = query_output.filter(Detection.confidence > min_confidence)
+        if min_class_score is not None:
+            query_output = query_output.filter(Detection.class_score > min_class_score)
+        query_output = query_output.all()
         return [item.absolute_path for item in query_output]
 
     def get_detections(self, file_path, min_confidence=None, min_class_score=None):

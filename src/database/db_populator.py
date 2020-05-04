@@ -50,5 +50,6 @@ class Populator:
                                           file_id=file.id,
                                           object_id=object.id,
                                           bbox=str(bbox),
-                                          confidence=confidence
+                                          confidence=confidence,
+                                          class_score=1.0
                                           )

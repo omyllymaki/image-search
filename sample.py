@@ -45,15 +45,16 @@ db_reader = DBReader(engine)
 print("Synchronizing database...")
 connector.synchronize()
 
-print("Finding images with detected clock...")
-paths = db_reader.get_files_with_object(["clock"])
-print(f"Found {len(paths)} images with clock")
+objects = ["aeroplane", "cake"]
+print(f"Finding images with objects: {objects}")
+paths = db_reader.get_paths(object_names=objects, min_confidence=0.7, min_class_score=0.7)
+print(f"Found {len(paths)} images")
 for p in paths[:10]:
     _, filename = os.path.split(p)
     image = cv2.imread(p)
     detections = db_reader.get_detections(p)
-    clock_detections = [d for d in detections if d["class"] == "clock"]
-    image = add_detection_boxes_to_image(image, clock_detections, (500, 500))
+    detections = [d for d in detections if d["class"] in objects]
+    image = add_detection_boxes_to_image(image, detections, (500, 500))
     cv2.imshow(f"{filename}", image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

@@ -2,15 +2,16 @@
 
 Tools to search and organize images. 
 
-## Project vision
+## Project content
 
 **Image processing functions**
 
-Processing functions are used to extract useful information from images. Could include e.g.
+Processing functions are used to extract useful information from images.
 
 - Tagging
 - Object detection
-- Extracting feature vectors
+- Face detection
+- Feature extraction
 
 **Synchronized database**
 
@@ -18,14 +19,11 @@ Database stores information extracted from images and it is synchronized with lo
 
 **Search functions and tools**
 
-Could include e.g.
-
 - Image search based on image query
 - Image search based on text query
 - Clustering
 - Duplicate detection
 - Blurriness detection
-- Anomaly detection
 
 ## Usage
 
