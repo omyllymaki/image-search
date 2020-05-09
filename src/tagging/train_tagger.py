@@ -25,7 +25,8 @@ def main():
     args = parser.parse_args()
 
     df = pd.read_csv(args.input, header="infer", engine='python')
-    df.iloc[:, 1] = df.iloc[:, 1].apply(lambda x: x.split(","))
+    df.fillna("", inplace=True)
+    df.iloc[:, 1] = df.iloc[:, 1].apply(lambda x: None if x == "" else x.split(","))
     df = df.sample(frac=1).reset_index(drop=True)
 
     n_samples = df.shape[0]

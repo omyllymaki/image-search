@@ -20,6 +20,8 @@ class TaggingDataset(Dataset):
             self.classes = classes
         else:
             self.classes = self.df.iloc[:, 1].explode().unique().tolist()
+            if None in self.classes:
+                self.classes.remove(None)
         self.one_hot_encoder = MultiLabelBinarizer(classes=self.classes)
 
     def __len__(self):
@@ -28,8 +30,11 @@ class TaggingDataset(Dataset):
     def __getitem__(self, index):
 
         tags = self.df.iloc[index][1]
-        tags_one_hot_encoded = self.one_hot_encoder.fit_transform([tags]).reshape(-1)
-        tag_tensor = torch.Tensor(tags_one_hot_encoded)
+        if not tags:
+            tag_tensor = torch.zeros(len(self.classes))
+        else:
+            tags_one_hot_encoded = self.one_hot_encoder.fit_transform([tags]).reshape(-1)
+            tag_tensor = torch.Tensor(tags_one_hot_encoded)
 
         path = self.df.iloc[index][0]
         image = load_image(path)
