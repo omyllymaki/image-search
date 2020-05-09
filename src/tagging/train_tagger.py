@@ -1,4 +1,5 @@
 import argparse
+import random
 
 import numpy as np
 import pandas as pd
@@ -9,37 +10,36 @@ from src.tagging.image_transforms import training_transforms, inference_transfor
 from src.tagging.models import get_tagger
 from src.tagging.tagging_dataset import TaggingDataset
 from src.tagging.utils import get_device
+from src.utils import load_json
 
 BATCH_SIZE = 6
 EPOCHS = 5
 LEARNING_RATE = 0.0005
 WEIGHT_DECAY = 0.01
 PROBABILITY_THRESHOLD = 0.5
+TRAINING_SET_PROPORTION = 0.7
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", required=True, help="Path to labels file.")
+    parser.add_argument("-i", "--input", required=True, help="Path to labels JSON file.")
     parser.add_argument("-w", "--weights_output", default="./tagger.model", help="Path of output model weights.")
     parser.add_argument("-c", "--classes_output", default="./classes.txt", help="Path of output classes names.")
     args = parser.parse_args()
 
-    df = pd.read_csv(args.input, header="infer", engine='python')
-    df.fillna("", inplace=True)
-    df.iloc[:, 1] = df.iloc[:, 1].apply(lambda x: None if x == "" else x.split(","))
-    df = df.sample(frac=1).reset_index(drop=True)
+    data = load_json(args.input)
+    random.shuffle(data)
 
-    n_samples = df.shape[0]
-    train_indices = np.arange(int(0.7 * n_samples))
-    valid_indices = np.arange(int(0.7 * n_samples), n_samples)
-    df_train = df.loc[train_indices]
-    df_valid = df.loc[valid_indices]
+    n_samples = len(data)
+    i_split = int(TRAINING_SET_PROPORTION * n_samples)
+    data_train = data[:i_split]
+    data_valid = data[i_split:]
 
     device = get_device()
-    ds_train = TaggingDataset(df_train, transform=training_transforms)
+    ds_train = TaggingDataset(data_train, transform=training_transforms)
     dl_train = DeviceDataLoader(ds_train, device, batch_size=6, shuffle=True, num_workers=4)
 
-    ds_valid = TaggingDataset(df_valid, transform=inference_transforms, classes=ds_train.classes)
+    ds_valid = TaggingDataset(data_valid, transform=inference_transforms, classes=ds_train.classes)
     dl_valid = DeviceDataLoader(ds_valid, device, batch_size=6, shuffle=True, num_workers=4)
 
     model = get_tagger(len(ds_train.classes))
