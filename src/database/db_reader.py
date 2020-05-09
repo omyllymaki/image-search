@@ -17,9 +17,12 @@ class DBReader:
                   min_detection_class_score=None,
                   tags=None,
                   min_tag_confidence=None):
-        query_output = self.session.query(File). \
-            join(Detection).join(Object).join(ImageTags).join(Tag)
+        query_output = self.session.query(File)
 
+        if object_names is not None:
+            query_output = query_output.join(Detection).join(Object)
+        if tags is not None:
+            query_output = query_output.join(ImageTags).join(Tag)
         if object_names is not None:
             query_output = query_output.filter(Object.name.in_(object_names))
         if min_detection_confidence is not None:
