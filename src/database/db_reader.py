@@ -71,3 +71,11 @@ class DBReader:
             }
             results.append(d)
         return results
+
+    def get_all_tags(self):
+        query_output = self.session.query(Tag.name).all()
+        return [item[0] for item in query_output]
+
+    def get_all_objects(self):
+        query_output = self.session.query(Object.name).all()
+        return [item[0] for item in query_output]
