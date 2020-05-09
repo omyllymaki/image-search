@@ -39,7 +39,7 @@ def add_detection_boxes_to_image(image_array, detections, target_size):
 
 engine = create_engine('sqlite:///image_db.db')
 
-connector = DBSynchronizer("dataset", engine)
+connector = DBSynchronizer("small_dataset", engine)
 db_reader = DBReader(engine)
 
 print("Synchronizing database...")
@@ -59,6 +59,11 @@ for p in paths[:10]:
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
+print(f"Finding all tags from database...")
+tags = db_reader.get_all_tags()
+print(f"Database has {len(tags)} tags: {tags}")
+
+
 tags = ["food"]
 print(f"Finding images with tags: {tags}")
 paths = db_reader.get_paths(tags=tags, min_tag_confidence=0.95)
@@ -66,6 +71,7 @@ print(f"Found {len(paths)} images")
 for p in paths[:10]:
     _, filename = os.path.split(p)
     image = cv2.imread(p)
+    image = cv2.resize(image, (500, 500))
     detections = db_reader.get_detections(p)
     detections = [d for d in detections if d["class"] in objects]
     cv2.imshow(f"{filename}", image)
