@@ -1,3 +1,5 @@
+import os
+
 import torch
 
 from src.tagging.image_transforms import inference_transforms
@@ -8,11 +10,14 @@ class Tagger:
 
     def __init__(self, threshold=0.3, device="cuda:0"):
         self.device = device
-        with open('classes.txt', 'r') as f:
+        base_path = os.path.split(os.path.abspath(__file__))[0]
+        classes_path = os.path.join(base_path, "classes.txt")
+        model_path = os.path.join(base_path, "tagger.model")
+        with open(classes_path, 'r') as f:
             classes = f.readlines()
         self.classes = [line.rstrip('\n') for line in classes]
         self.model = get_tagger(len(self.classes))
-        self.model.load_state_dict(torch.load("tagger.model"))
+        self.model.load_state_dict(torch.load(model_path))
         self.model.eval()
         self.model.to(self.device)
         self.threshold = threshold

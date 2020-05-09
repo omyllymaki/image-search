@@ -56,6 +56,7 @@ class ImageTags(Base):
     id = Column(Integer, primary_key=True)
     file_id = Column(Integer, ForeignKey('file.id'))
     tag_id = Column(Integer, ForeignKey('tag.id'))
+    confidence = Column(Float)
 
 
 def create_tables(engine):

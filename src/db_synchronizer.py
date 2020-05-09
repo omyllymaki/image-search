@@ -34,17 +34,15 @@ class DBSynchronizer:
     def _add_new_images_to_db(self, paths):
         print(f"Found {len(paths)} new images that are not in database")
         print("Creating new items to database...")
+        populator = Populator(self.engine)
         self.processor = ImageProcessor()
-        data = []
         for i, path in enumerate(paths):
             print(f"{i + 1}/{len(paths)}")
             image = load_image(path)
             results = self.processor.process(image)
             file_info = collect_file_info(path)
-            data.append({**results, **file_info})
-
-        populator = Populator(self.engine)
-        populator.populate(data)
+            data = {**results, **file_info}
+            populator.populate(data)
 
     def _remove_images_from_db(self, paths):
         # TODO: delete also related rows from other tables
